@@ -1,102 +1,147 @@
-/* Mobile fixes for provided markup (header + hero + anchors)
-   Версия: 2026-05-18 (v4)
-   Что нового: добавлен iOS/Yandex iOS «микрогэп» сверху для sticky-хедера,
-   чтобы плавающая адресная плашка не перекрывала шапку. Обновлены offset-ы якорей.
-   Подключать ПОСЛЕ styles.css
+/*
+  Mobile fixes for Agrinno (mobile-fixes.css)
+  Подключай после основного CSS, чтобы переопределить стили.
+  Дата: 2026-05-18
 */
 
 :root {
-  --header-h: 72px;          /* Базовая высота шапки */
-  --ios-gap: 0px;            /* Микро-зазор сверху (по умолчанию 0, на iOS станет 8px) */
-  --scroll-offset: calc(var(--header-h) + var(--ios-gap) + 6px); /* отступ для якорей */
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --radius: 12px;
+  --radius-lg: 20px;
 }
 
-/* Детектор iOS/WebKit: задаём зазор 8px только на iOS-браузерах */
-@supports (-webkit-touch-callout: none) {
-  :root { --ios-gap: 8px; }
+/* Базовые улучшения типографики и отрисовки */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg, video { max-width: 100%; height: auto; }
+
+/* Заголовки и текст: адаптивные размеры + аккуратные переносы */
+h1 {
+  font-size: clamp(28px, 7vw, 40px);
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  text-wrap: balance; /* Safari/Chrome поддержка балансировки строк */
+  margin: 0 0 var(--space-4);
 }
 
-/* ===== ГЛОБАЛЬНОЕ ИСПРАВЛЕНИЕ ЯКОРЕЙ ===== */
-/* Чтобы заголовки/секции не прятались под липкую шапку при переходе по #якорям */
-html { scroll-padding-top: var(--scroll-offset); }
-[id] { scroll-margin-top: var(--scroll-offset); }
-
-/* ===== HEADER / Шапка ===== */
-.site-header {
-  position: sticky;          /* липкая шапка */
-  top: var(--ios-gap);        /* небольшой отступ сверху на iOS, 0 на других */
-  z-index: 1000;
-  background: color-mix(in srgb, #ffffff 88%, transparent);
-  -webkit-backdrop-filter: saturate(140%) blur(8px);
-  backdrop-filter: saturate(140%) blur(8px);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+h2 {
+  font-size: clamp(22px, 5.4vw, 32px);
+  line-height: 1.25;
+  text-wrap: balance;
+  margin: 0 0 var(--space-3);
 }
 
-.header-inner {
-  display: grid;
-  grid-template-columns: 1fr auto auto; /* бренд шире, управление справа */
-  align-items: center;
-  gap: 8px;
-  padding: calc(env(safe-area-inset-top) + 8px) 12px 10px 12px;
-  min-height: var(--header-h);
-  box-sizing: border-box;
+p, li {
+  font-size: clamp(16px, 3.9vw, 18px);
+  line-height: 1.6;
 }
 
-.logo { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
-.logo-mark { width: 22px; height: 22px; display: inline-grid; place-items: center; }
-.logo-text {
-  font-weight: 700; font-size: 18px; color: #0a3f2b;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+/* Контейнеры/секции: комфортные боковые поля на мобиле */
+.section, .hero, .container, main > section, header, footer {
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.nav-toggle {
-  width: 44px; height: 44px; display: inline-grid; place-items: center;
-  background: none; border: 0; padding: 0; margin: 0 2px; cursor: pointer;
-}
-
-/* Меню: мобильно — выпадающее под шапкой; десктоп — в линию */
-.site-nav { display: none; }
-.site-header.nav-open .site-nav,
-.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav {
-  display: block;
-  position: fixed;
-  top: calc(var(--header-h) + var(--ios-gap));
-  left: 10px; right: 10px;
-  z-index: 1100;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  padding: 10px;
-}
-.site-header.nav-open .site-nav .nav-link,
-.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link {
-  display: block; padding: 12px 10px; border-radius: 10px; margin: 2px 0;
-}
-.site-header.nav-open .site-nav .nav-link.cta,
-.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link.cta { font-weight: 700; }
-
-@media (min-width: 768px) {
-  .header-inner { grid-template-columns: 1fr auto; }
-  .nav-toggle { display: none; }
-  .site-nav { display: flex; align-items: center; gap: 16px; position: static; padding: 0; box-shadow: none; border: 0; }
-  .site-nav .nav-link { padding: 10px 6px; }
-}
-
-/* ===== HERO / Первый экран ===== */
-main .container { padding-left: 12px; padding-right: 12px; }
-.hero .container, .hero .content, .hero-content, .intro, .lead { max-width: none; }
-
-h1 { font-size: clamp(26px, 7.2vw, 38px); line-height: 1.22; text-wrap: balance; }
-p.lead, .intro p { font-size: clamp(16px, 3.9vw, 18px); line-height: 1.6; }
-
-.hero .buttons, .buttons, .cta-row { display: grid; gap: 12px; }
-.hero .buttons > *, .buttons > *, .cta-row > * { width: 100%; min-height: 48px; }
-
-/* Безопасные отступы снизу для нижней панели iOS */
+/* Безопасные отступы под нижнюю панель iOS (актуально для нижних блоков) */
 @supports (padding: max(0px)) {
-  footer, main > section:last-child { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+  .hero, .section:last-child, footer {
+    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+  }
 }
 
-/* На очень узких экранах немного уменьшаем h1 */
-@media (max-width: 360px) { h1 { font-size: clamp(24px, 8vw, 32px); } }
+/* Кнопки: комфортная зона тапа и плотные отступы */
+a.button, .button, .btn,
+button, button[type="submit"],
+input[type="submit"], input[type="button"] {
+  min-height: 48px;            /* >= 44px по гайдлайнам Apple */
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.2;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+}
+
+/* Группа CTA-кнопок в герое */
+.hero-ctas, .cta-row, .buttons, .hero .buttons-row {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 12px;
+}
+
+/* На планшете можно вернуть их в строку */
+@media (min-width: 560px) {
+  .hero-ctas, .cta-row, .buttons, .hero .buttons-row {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Делаем кнопки «на всю ширину» на мобиле */
+.hero-ctas > *, .cta-row > *, .buttons > * {
+  width: 100%;
+}
+
+/* Улучшение контрастности вторичной кнопки рядом с первичной */
+.btn--secondary, .button--secondary, .btn.outline, .button.outline {
+  border-width: 1.5px;
+}
+
+/* Шапка/бургер: увеличиваем зону тапа и отступы */
+.header, header.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: saturate(180%) blur(10px);
+}
+
+.header .burger, .site-header .burger, .menu-toggle {
+  width: 44px; height: 44px;
+  display: inline-grid; place-items: center;
+  margin-right: 4px;
+}
+
+/* Отступ сверху первому блоку, если шапка фикс */
+main > :first-child { scroll-margin-top: 72px; }
+
+/* Карточка-герой: чтобы тень/радиус не обрезались и не прилипали к краям */
+.hero-card, .hero .card {
+  border-radius: var(--radius-lg);
+  overflow: clip;
+}
+
+/* Устраняем случайный горизонтальный скролл на мобиле */
+html, body { overflow-x: hidden; }
+
+/* Интерактивные состояния для доступности */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a7a4b 70%, #000 30%);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* Таблицы/изображения: предотвращаем ломание вьюпорта */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Мета: если используешь .container фикс ширины — ограничим её на десктопе */
+@media (min-width: 1024px) {
+  .container { max-width: 1060px; margin-inline: auto; }
+}
+
+/* Балансируем вертикальные отступы внутри секций */
+.section { padding-top: var(--space-5); padding-bottom: var(--space-5); }
+
+/* Дополнительно: чутка уменьшаем жирность заголовка на очень узких экранах,
+   чтобы не «рябило» */
+@media (max-width: 360px) {
+  h1 { font-weight: 700; }
+}
