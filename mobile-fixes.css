@@ -1,24 +1,30 @@
 /* Mobile fixes for provided markup (header + hero + anchors)
-   Версия: 2026-05-18 (v3)
-   Исправляет: наложение при переходе по ссылкам-якорям (Почему Helix aspersa?), расширяет зону логотипа, липкая шапка, шире хиро на мобиле.
+   Версия: 2026-05-18 (v4)
+   Что нового: добавлен iOS/Yandex iOS «микрогэп» сверху для sticky-хедера,
+   чтобы плавающая адресная плашка не перекрывала шапку. Обновлены offset-ы якорей.
    Подключать ПОСЛЕ styles.css
 */
 
 :root {
-  --header-h: 72px; /* высота шапки на мобиле */
-  --scroll-offset: calc(var(--header-h) + env(safe-area-inset-top) + 8px);
+  --header-h: 72px;          /* Базовая высота шапки */
+  --ios-gap: 0px;            /* Микро-зазор сверху (по умолчанию 0, на iOS станет 8px) */
+  --scroll-offset: calc(var(--header-h) + var(--ios-gap) + 6px); /* отступ для якорей */
+}
+
+/* Детектор iOS/WebKit: задаём зазор 8px только на iOS-браузерах */
+@supports (-webkit-touch-callout: none) {
+  :root { --ios-gap: 8px; }
 }
 
 /* ===== ГЛОБАЛЬНОЕ ИСПРАВЛЕНИЕ ЯКОРЕЙ ===== */
-/* Чтобы заголовки не «заезжали» под липкую шапку при переходе по #ссылкам */
+/* Чтобы заголовки/секции не прятались под липкую шапку при переходе по #якорям */
 html { scroll-padding-top: var(--scroll-offset); }
-/* На случай, если браузер игнорирует scroll-padding-top — добавим запасной вариант */
 [id] { scroll-margin-top: var(--scroll-offset); }
 
 /* ===== HEADER / Шапка ===== */
 .site-header {
-  position: sticky; /* липкая шапка без перекрытия при прокрутке */
-  top: 0;
+  position: sticky;          /* липкая шапка */
+  top: var(--ios-gap);        /* небольшой отступ сверху на iOS, 0 на других */
   z-index: 1000;
   background: color-mix(in srgb, #ffffff 88%, transparent);
   -webkit-backdrop-filter: saturate(140%) blur(8px);
@@ -54,7 +60,7 @@ html { scroll-padding-top: var(--scroll-offset); }
 .site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav {
   display: block;
   position: fixed;
-  top: calc(var(--header-h) + env(safe-area-inset-top));
+  top: calc(var(--header-h) + var(--ios-gap));
   left: 10px; right: 10px;
   z-index: 1100;
   background: #fff;
@@ -87,8 +93,10 @@ p.lead, .intro p { font-size: clamp(16px, 3.9vw, 18px); line-height: 1.6; }
 .hero .buttons, .buttons, .cta-row { display: grid; gap: 12px; }
 .hero .buttons > *, .buttons > *, .cta-row > * { width: 100%; min-height: 48px; }
 
+/* Безопасные отступы снизу для нижней панели iOS */
 @supports (padding: max(0px)) {
   footer, main > section:last-child { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
 }
 
+/* На очень узких экранах немного уменьшаем h1 */
 @media (max-width: 360px) { h1 { font-size: clamp(24px, 8vw, 32px); } }
