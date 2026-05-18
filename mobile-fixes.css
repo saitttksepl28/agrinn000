@@ -37,8 +37,8 @@ header.site-header, .header, .site-header {
 
 /* Текст логотипа/названия (Агринно) — чтобы занимал больше места */
 .site-header .brand .logo-text, .logo-text, .brand .name {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 900;
   color: #0a3f2b; /* тёмно-зелёный */
   white-space: nowrap;
   overflow: hidden;
