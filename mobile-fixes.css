@@ -1,113 +1,115 @@
-/* Mobile fixes — header & hero adjustments
-   Обновлён 2026-05-18: исправляет наложение верхней части, делает блок с "Агринно" шире и меню корректнее
-   Подключай после основного CSS (заменяет/дополняет предыдущую версию).
+/* Mobile fixes for provided markup (header + hero)
+   Версия: 2026-05-18
+   Цель: убрать наложение сверху, расширить область "Агринно", корректно закрепить меню, сделать хиро шире на мобиле.
+   Подключать ПОСЛЕ styles.css
 */
 
 :root {
-  --header-offset: 72px; /* если поменяется, подгоняй */
+  --header-h: 72px; /* высота шапки на мобиле */
 }
 
-/* ---- HEADER / Верхняя панель ---- */
-/* Делаем шапку самостоятельным блоком, чтобы не накладывалась */
-header.site-header, .header, .site-header {
-  position: sticky !important;
+/* ===== HEADER / Шапка ===== */
+.site-header {
+  position: sticky; /* липкая шапка без перекрытия при прокрутке */
   top: 0;
-  z-index: 400;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: calc(env(safe-area-inset-top) + 8px) 12px 10px 12px;
-  box-sizing: border-box;
-  background: color-mix(in srgb, #ffffff 86%, transparent);
-  -webkit-backdrop-filter: saturate(140%) blur(6px);
-  backdrop-filter: saturate(140%) blur(6px);
-  border-bottom: 1px solid rgba(10, 40, 20, 0.04);
-  min-height: var(--header-offset);
+  z-index: 1000;
+  background: color-mix(in srgb, #ffffff 88%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-/* Убираем возможное абсолютное позиционирование логотипа */
-.site-header .brand, .header .brand, .logo-wrap, .site-logo {
-  display: flex;
+/* Внутри шапки: 1) логотип тянется; 2) затем бургер; 3) меню */
+.header-inner {
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* бренд шире, управление справа */
+  align-items: center;
+  gap: 8px;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 10px 12px;
+  min-height: var(--header-h);
+  box-sizing: border-box;
+}
+
+/* Лого + текст: позволяем занимать место и обрезать с троеточием при нехватке */
+.logo {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 0; /* важно для text-overflow */
-  flex: 1 1 auto; /* делаем левую часть растущей */
+  min-width: 0;   /* даёт работать text-overflow */
+}
+.logo-mark { width: 22px; height: 22px; display: inline-grid; place-items: center; }
+.logo-text {
+  font-weight: 700; font-size: 18px; color: #0a3f2b;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Текст логотипа/названия (Агринно) — чтобы занимал больше места */
-.site-header .brand .logo-text, .logo-text, .brand .name {
-  font-size: 30px;
-  font-weight: 900;
-  color: #0a3f2b; /* тёмно-зелёный */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Иконка/круг рядом с логотипом — фиксированный размер */
-.site-header .brand .logo-icon, .logo-icon, .brand .icon {
-  width: 22px; height: 22px; flex: 0 0 22px; border-radius: 50%;
-}
-
-/* Меню/бургер — справа, с удобной зоной тапа */
-.site-header .nav, .site-header .menu, .header .nav, .menu-wrap {
-  display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
-}
-.menu-toggle, .burger, .site-header .burger {
+/* Бургер — удобная зона тапа */
+.nav-toggle {
   width: 44px; height: 44px; display: inline-grid; place-items: center;
-  background: transparent; border: 0; padding: 0; margin: 0 4px;
+  background: none; border: 0; padding: 0; margin: 0 2px; cursor: pointer;
 }
 
-/* Предотвращаем перекрытие меню и основного контента */
-/* Если у тебя фиксированный header — main/hero должны иметь верхний отступ */
-main, .main, .site-main {
-  padding-top: calc(var(--header-offset) + env(safe-area-inset-top));
+/* Меню: на мобиле скрыто, раскрывается под шапкой; на десктопе — в строке */
+.site-nav {
+  display: none;
 }
 
-/* Для корректного скролла якорей */
-main > :first-child, .hero { scroll-margin-top: calc(var(--header-offset) + env(safe-area-inset-top)); }
-
-/* Если шапка не должна быть прозрачной — можно сделать фон сплошным
-   Раскомментируй при желании:
-header.site-header { background: #fff; }
-*/
-
-/* ---- HERO: увеличиваем ширину блока с текстом/кнопками ---- */
-/* Если у себя используешь .hero .content или .hero-left — добавь соответствующие селекторы */
-.hero, .hero .content, .hero-content, .hero-left {
-  width: 100%;
-  max-width: none; /* разрешаем занимать всю ширину контейнера */
-  box-sizing: border-box;
-  padding-left: 12px; padding-right: 12px; /* чуть уже отступы, чтобы стало шире */
+/* Открываем меню, когда aria-expanded=true ИЛИ если на .site-header повесим класс .nav-open */
+.site-header.nav-open .site-nav,
+.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav {
+  display: block;
+  position: fixed;
+  top: calc(var(--header-h) + env(safe-area-inset-top));
+  left: 10px; right: 10px;
+  z-index: 1100;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 10px;
+}
+.site-header.nav-open .site-nav .nav-link,
+.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link {
+  display: block; padding: 12px 10px; border-radius: 10px; margin: 2px 0;
+}
+.site-header.nav-open .site-nav .nav-link.cta,
+.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link.cta {
+  font-weight: 700;
 }
 
-/* Уменьшаем боковые паддинги для мобильной версии, чтобы заголовок был шире */
-@media (max-width: 420px) {
-  .section, .hero, .container, main > section, header, footer {
-    padding-left: 10px; padding-right: 10px;
-  }
-  h1 { font-size: clamp(26px, 7.5vw, 34px); }
+/* Десктоп/планшет: меню показываем справа, бургер прячем */
+@media (min-width: 768px) {
+  .header-inner { grid-template-columns: 1fr auto; }
+  .nav-toggle { display: none; }
+  .site-nav { display: flex; align-items: center; gap: 16px; }
+  .site-nav .nav-link { padding: 10px 6px; }
 }
 
-/* Если у тебя карточка-герой с боковым расположением — переводим в столбец на мобиле */
-@media (max-width: 560px) {
-  .hero-row, .hero-columns, .hero .row, .hero .columns {
-    display: block;
-  }
-  .hero .left, .hero .right { width: 100%; }
+/* Чтобы контент не заезжал под шапку при переходах по якорям */
+main > * { scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top) + 8px); }
+
+/* ===== HERO / Первый экран ===== */
+/* Ширим текст и убираем лишние боковые поля на мобиле */
+main .container { padding-left: 12px; padding-right: 12px; }
+
+/* Если в хиро есть .hero или .intro — снимаем жёсткие max-width */
+.hero .container, .hero .content, .hero-content, .intro, .lead {
+  max-width: none;
 }
 
-/* ---- Безопасность: перекрытие верхнего бордера браузера ( notch/status bar) ---- */
-/* Если статус-бар всё ещё перекрывает — увеличь --header-offset в :root */
+/* Типографика героя чуть компактнее, чтобы влезало в ширину без перенапряжения */
+h1 { font-size: clamp(26px, 7.2vw, 38px); line-height: 1.22; text-wrap: balance; }
+p.lead, .intro p { font-size: clamp(16px, 3.9vw, 18px); line-height: 1.6; }
 
-/* ---- Вспомогательное: предотвращаем обрезание текста внутри header ---- */
-.site-header .brand *, .site-header .nav * { max-width: 100%; }
+/* Кнопки в колонку на мобиле и на всю ширину */
+.hero .buttons, .buttons, .cta-row { display: grid; gap: 12px; }
+.hero .buttons > *, .buttons > *, .cta-row > * { width: 100%; min-height: 48px; }
 
-/* ---- Визуальные мелочи ---- */
-/* Увеличиваем контраст меню по необходимости */
-.site-header .nav a, .site-header .menu a, .header .nav a { color: #0a3f2b; text-decoration: none; }
+/* ===== Прочее ===== */
+/* Безопасные отступы снизу для нижней панели iOS */
+@supports (padding: max(0px)) {
+  footer, main > section:last-child { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
 
-/* Фолбэк — если у тебя кастомные классы, добавь их сюда или пришли структуру */
-
-/* Конец файла */
+/* На очень узких экранах немного уменьшаем h1 */
+@media (max-width: 360px) { h1 { font-size: clamp(24px, 8vw, 32px); } }
