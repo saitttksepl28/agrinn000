@@ -1,0 +1,113 @@
+/* Mobile fixes — header & hero adjustments
+   Обновлён 2026-05-18: исправляет наложение верхней части, делает блок с "Агринно" шире и меню корректнее
+   Подключай после основного CSS (заменяет/дополняет предыдущую версию).
+*/
+
+:root {
+  --header-offset: 72px; /* если поменяется, подгоняй */
+}
+
+/* ---- HEADER / Верхняя панель ---- */
+/* Делаем шапку самостоятельным блоком, чтобы не накладывалась */
+header.site-header, .header, .site-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 10px 12px;
+  box-sizing: border-box;
+  background: color-mix(in srgb, #ffffff 86%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(6px);
+  backdrop-filter: saturate(140%) blur(6px);
+  border-bottom: 1px solid rgba(10, 40, 20, 0.04);
+  min-height: var(--header-offset);
+}
+
+/* Убираем возможное абсолютное позиционирование логотипа */
+.site-header .brand, .header .brand, .logo-wrap, .site-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0; /* важно для text-overflow */
+  flex: 1 1 auto; /* делаем левую часть растущей */
+}
+
+/* Текст логотипа/названия (Агринно) — чтобы занимал больше места */
+.site-header .brand .logo-text, .logo-text, .brand .name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0a3f2b; /* тёмно-зелёный */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Иконка/круг рядом с логотипом — фиксированный размер */
+.site-header .brand .logo-icon, .logo-icon, .brand .icon {
+  width: 22px; height: 22px; flex: 0 0 22px; border-radius: 50%;
+}
+
+/* Меню/бургер — справа, с удобной зоной тапа */
+.site-header .nav, .site-header .menu, .header .nav, .menu-wrap {
+  display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+}
+.menu-toggle, .burger, .site-header .burger {
+  width: 44px; height: 44px; display: inline-grid; place-items: center;
+  background: transparent; border: 0; padding: 0; margin: 0 4px;
+}
+
+/* Предотвращаем перекрытие меню и основного контента */
+/* Если у тебя фиксированный header — main/hero должны иметь верхний отступ */
+main, .main, .site-main {
+  padding-top: calc(var(--header-offset) + env(safe-area-inset-top));
+}
+
+/* Для корректного скролла якорей */
+main > :first-child, .hero { scroll-margin-top: calc(var(--header-offset) + env(safe-area-inset-top)); }
+
+/* Если шапка не должна быть прозрачной — можно сделать фон сплошным
+   Раскомментируй при желании:
+header.site-header { background: #fff; }
+*/
+
+/* ---- HERO: увеличиваем ширину блока с текстом/кнопками ---- */
+/* Если у себя используешь .hero .content или .hero-left — добавь соответствующие селекторы */
+.hero, .hero .content, .hero-content, .hero-left {
+  width: 100%;
+  max-width: none; /* разрешаем занимать всю ширину контейнера */
+  box-sizing: border-box;
+  padding-left: 12px; padding-right: 12px; /* чуть уже отступы, чтобы стало шире */
+}
+
+/* Уменьшаем боковые паддинги для мобильной версии, чтобы заголовок был шире */
+@media (max-width: 420px) {
+  .section, .hero, .container, main > section, header, footer {
+    padding-left: 10px; padding-right: 10px;
+  }
+  h1 { font-size: clamp(26px, 7.5vw, 34px); }
+}
+
+/* Если у тебя карточка-герой с боковым расположением — переводим в столбец на мобиле */
+@media (max-width: 560px) {
+  .hero-row, .hero-columns, .hero .row, .hero .columns {
+    display: block;
+  }
+  .hero .left, .hero .right { width: 100%; }
+}
+
+/* ---- Безопасность: перекрытие верхнего бордера браузера ( notch/status bar) ---- */
+/* Если статус-бар всё ещё перекрывает — увеличь --header-offset в :root */
+
+/* ---- Вспомогательное: предотвращаем обрезание текста внутри header ---- */
+.site-header .brand *, .site-header .nav * { max-width: 100%; }
+
+/* ---- Визуальные мелочи ---- */
+/* Увеличиваем контраст меню по необходимости */
+.site-header .nav a, .site-header .menu a, .header .nav a { color: #0a3f2b; text-decoration: none; }
+
+/* Фолбэк — если у тебя кастомные классы, добавь их сюда или пришли структуру */
+
+/* Конец файла */
