@@ -1,12 +1,19 @@
-/* Mobile fixes for provided markup (header + hero)
-   Версия: 2026-05-18
-   Цель: убрать наложение сверху, расширить область "Агринно", корректно закрепить меню, сделать хиро шире на мобиле.
+/* Mobile fixes for provided markup (header + hero + anchors)
+   Версия: 2026-05-18 (v3)
+   Исправляет: наложение при переходе по ссылкам-якорям (Почему Helix aspersa?), расширяет зону логотипа, липкая шапка, шире хиро на мобиле.
    Подключать ПОСЛЕ styles.css
 */
 
 :root {
   --header-h: 72px; /* высота шапки на мобиле */
+  --scroll-offset: calc(var(--header-h) + env(safe-area-inset-top) + 8px);
 }
+
+/* ===== ГЛОБАЛЬНОЕ ИСПРАВЛЕНИЕ ЯКОРЕЙ ===== */
+/* Чтобы заголовки не «заезжали» под липкую шапку при переходе по #ссылкам */
+html { scroll-padding-top: var(--scroll-offset); }
+/* На случай, если браузер игнорирует scroll-padding-top — добавим запасной вариант */
+[id] { scroll-margin-top: var(--scroll-offset); }
 
 /* ===== HEADER / Шапка ===== */
 .site-header {
@@ -19,7 +26,6 @@
   border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-/* Внутри шапки: 1) логотип тянется; 2) затем бургер; 3) меню */
 .header-inner {
   display: grid;
   grid-template-columns: 1fr auto auto; /* бренд шире, управление справа */
@@ -30,31 +36,20 @@
   box-sizing: border-box;
 }
 
-/* Лого + текст: позволяем занимать место и обрезать с троеточием при нехватке */
-.logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;   /* даёт работать text-overflow */
-}
+.logo { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .logo-mark { width: 22px; height: 22px; display: inline-grid; place-items: center; }
 .logo-text {
   font-weight: 700; font-size: 18px; color: #0a3f2b;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Бургер — удобная зона тапа */
 .nav-toggle {
   width: 44px; height: 44px; display: inline-grid; place-items: center;
   background: none; border: 0; padding: 0; margin: 0 2px; cursor: pointer;
 }
 
-/* Меню: на мобиле скрыто, раскрывается под шапкой; на десктопе — в строке */
-.site-nav {
-  display: none;
-}
-
-/* Открываем меню, когда aria-expanded=true ИЛИ если на .site-header повесим класс .nav-open */
+/* Меню: мобильно — выпадающее под шапкой; десктоп — в линию */
+.site-nav { display: none; }
 .site-header.nav-open .site-nav,
 .site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav {
   display: block;
@@ -73,43 +68,27 @@
   display: block; padding: 12px 10px; border-radius: 10px; margin: 2px 0;
 }
 .site-header.nav-open .site-nav .nav-link.cta,
-.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link.cta {
-  font-weight: 700;
-}
+.site-header:has(.nav-toggle[aria-expanded="true"]) .site-nav .nav-link.cta { font-weight: 700; }
 
-/* Десктоп/планшет: меню показываем справа, бургер прячем */
 @media (min-width: 768px) {
   .header-inner { grid-template-columns: 1fr auto; }
   .nav-toggle { display: none; }
-  .site-nav { display: flex; align-items: center; gap: 16px; }
+  .site-nav { display: flex; align-items: center; gap: 16px; position: static; padding: 0; box-shadow: none; border: 0; }
   .site-nav .nav-link { padding: 10px 6px; }
 }
 
-/* Чтобы контент не заезжал под шапку при переходах по якорям */
-main > * { scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top) + 8px); }
-
 /* ===== HERO / Первый экран ===== */
-/* Ширим текст и убираем лишние боковые поля на мобиле */
 main .container { padding-left: 12px; padding-right: 12px; }
+.hero .container, .hero .content, .hero-content, .intro, .lead { max-width: none; }
 
-/* Если в хиро есть .hero или .intro — снимаем жёсткие max-width */
-.hero .container, .hero .content, .hero-content, .intro, .lead {
-  max-width: none;
-}
-
-/* Типографика героя чуть компактнее, чтобы влезало в ширину без перенапряжения */
 h1 { font-size: clamp(26px, 7.2vw, 38px); line-height: 1.22; text-wrap: balance; }
 p.lead, .intro p { font-size: clamp(16px, 3.9vw, 18px); line-height: 1.6; }
 
-/* Кнопки в колонку на мобиле и на всю ширину */
 .hero .buttons, .buttons, .cta-row { display: grid; gap: 12px; }
 .hero .buttons > *, .buttons > *, .cta-row > * { width: 100%; min-height: 48px; }
 
-/* ===== Прочее ===== */
-/* Безопасные отступы снизу для нижней панели iOS */
 @supports (padding: max(0px)) {
   footer, main > section:last-child { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
 }
 
-/* На очень узких экранах немного уменьшаем h1 */
 @media (max-width: 360px) { h1 { font-size: clamp(24px, 8vw, 32px); } }
